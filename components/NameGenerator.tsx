@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { GoogleGenAI, Type } from '@google/genai';
 import Section from './Section';
 import Loader from './Loader';
 import { ChineseName } from '../types';
+import { GoogleGenAI, Type } from "@google/genai";
 
 const GiftIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -34,61 +34,66 @@ const NameGenerator: React.FC = () => {
       setError('Bạn chưa nhập tên kìa!');
       return;
     }
+    if (!process.env.API_KEY) {
+      setError('Lỗi cấu hình: API Key chưa được thiết lập.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setGeneratedNames([]);
 
     try {
-      if (!process.env.API_KEY) {
-        throw new Error("API key is not configured.");
-      }
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      
       let prompt;
       if (name.trim() === 'Mỹ Tiên') {
           prompt = `Bạn là một chuyên gia về văn hóa và cách đặt tên của Trung Quốc. Có một bạn nữ học sinh cấp 3 người Việt Nam đang học tiếng Trung. 
-Tên tiếng Việt của bạn ấy là "Mỹ Tiên". Trong đó, "Mỹ" (美) có nghĩa là xinh đẹp, và "Tiên" (仙) có nghĩa là tiên nữ, nàng tiên. 
-Dựa vào ý nghĩa này, hãy gợi ý 3 cái tên tiếng Trung thật hay và ý nghĩa cho bạn ấy. Với mỗi tên, hãy cung cấp:
-1. Tên bằng chữ Hán.
-2. Phiên âm Pinyin.
-3. Giải thích chi tiết ý nghĩa của từng ký tự và ý nghĩa của cả cái tên, tại sao nó lại là một cái tên hay cho một bạn nữ.
-Hãy trả lời bằng định dạng JSON.`;
+    Tên tiếng Việt của bạn ấy là "Mỹ Tiên". Trong đó, "Mỹ" (美) có nghĩa là xinh đẹp, và "Tiên" (仙) có nghĩa là tiên nữ, nàng tiên. 
+    Dựa vào ý nghĩa này, hãy gợi ý 3 cái tên tiếng Trung thật hay và ý nghĩa cho bạn ấy. Với mỗi tên, hãy cung cấp:
+    1. Tên bằng chữ Hán.
+    2. Phiên âm Pinyin.
+    3. Giải thích chi tiết ý nghĩa của từng ký tự và ý nghĩa của cả cái tên, tại sao nó lại là một cái tên hay cho một bạn nữ.
+    Hãy trả lời bằng định dạng JSON.`;
       } else {
           prompt = `Bạn là một chuyên gia về văn hóa và cách đặt tên của Trung Quốc. Có một bạn nữ học sinh cấp 3 người Việt Nam đang học tiếng Trung. Tên tiếng Việt của bạn ấy là "${name}".
-Hãy gợi ý 3 cái tên tiếng Trung thật hay và ý nghĩa cho bạn ấy. Với mỗi tên, hãy cung cấp:
-1. Tên bằng chữ Hán.
-2. Phiên âm Pinyin.
-3. Giải thích chi tiết ý nghĩa của từng ký tự và ý nghĩa của cả cái tên, tại sao nó lại là một cái tên hay cho một bạn nữ.
-Hãy trả lời bằng định dạng JSON.`;
+    Hãy gợi ý 3 cái tên tiếng Trung thật hay và ý nghĩa cho bạn ấy. Với mỗi tên, hãy cung cấp:
+    1. Tên bằng chữ Hán.
+    2. Phiên âm Pinyin.
+    3. Giải thích chi tiết ý nghĩa của từng ký tự và ý nghĩa của cả cái tên, tại sao nó lại là một cái tên hay cho một bạn nữ.
+    Hãy trả lời bằng định dạng JSON.`;
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                chineseName: { type: Type.STRING },
-                pinyin: { type: Type.STRING },
-                meaning: { type: Type.STRING }
-              },
-              required: ["chineseName", "pinyin", "meaning"]
-            }
+      const genAIResponse = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                  type: Type.ARRAY,
+                  items: {
+                      type: Type.OBJECT,
+                      properties: {
+                          chineseName: { type: Type.STRING },
+                          pinyin: { type: Type.STRING },
+                          meaning: { type: Type.STRING }
+                      },
+                      required: ["chineseName", "pinyin", "meaning"]
+                  }
+              }
           }
-        }
       });
-      
-      const jsonText = response.text.trim();
+
+      const jsonText = genAIResponse.text.trim();
       const parsedNames = JSON.parse(jsonText);
       setGeneratedNames(parsedNames);
 
     } catch (err) {
       console.error(err);
-      setError('Oops! Có lỗi xảy ra khi tạo tên. Bạn thử lại sau nhé.');
+      if (err instanceof Error) {
+        setError(`Oops! Có lỗi xảy ra: ${err.message}. Bạn thử lại sau nhé.`);
+      } else {
+        setError('Oops! Có lỗi không xác định xảy ra. Bạn thử lại sau nhé.');
+      }
     } finally {
       setIsLoading(false);
     }

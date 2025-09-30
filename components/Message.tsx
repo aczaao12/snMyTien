@@ -11,7 +11,7 @@ const Message: React.FC = () => {
   return (
     <Section title="Gửi Mỹ Tiên," icon={<MessageIcon />}>
       <p className="text-lg leading-relaxed">
-        Chúc mừng sinh nhật nhé! Vậy là đã bước sang tuổi 20 rồi, một cột mốc thật đẹp. Tuổi mới chúc bạn luôn xinh đẹp, vui vẻ, tràn đầy năng lượng và đạt được mọi mục tiêu mình đặt ra.
+        Chúc mừng sinh nhật tuổi 19 nhé! Một cột mốc thật đẹp. Tuổi mới chúc bạn luôn xinh đẹp, vui vẻ, tràn đầy năng lượng và đạt được mọi mục tiêu mình đặt ra.
       </p>
       <p className="leading-relaxed">
         Đặc biệt, trên con đường chinh phục tiếng Trung, mong bạn sẽ luôn giữ vững nhiệt huyết và ngày càng tiến bộ. Cố lên nhé!
