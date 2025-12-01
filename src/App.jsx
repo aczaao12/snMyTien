@@ -3,6 +3,8 @@ import QuoteBook from './components/QuoteBook';
 import Monster from './components/Monster';
 import BigNumber from './components/BigNumber';
 import LanguageSelector from './components/LanguageSelector';
+import StartOverlay from './components/StartOverlay';
+import OrientationWarning from './components/OrientationWarning';
 import { translations } from './i18n/translations';
 import gsap from 'gsap';
 import cakeImg from './assets/cake.png';
@@ -32,6 +34,7 @@ function App() {
   const [bubbleText, setBubbleText] = useState('');
   const [monsterFlip, setMonsterFlip] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false); // For start overlay
 
   // Party Monsters State
   const [owletAction, setOwletAction] = useState('idle');
@@ -40,6 +43,11 @@ function App() {
 
   // Wishes State
   const [currentWish, setCurrentWish] = useState('');
+
+  // Handle start button click
+  const handleStart = () => {
+    setHasStarted(true);
+  };
 
   // Dance Moves List (excluding rock/dust)
   const danceMoves = [
@@ -70,6 +78,8 @@ function App() {
   }, [isDancing]);
 
   useEffect(() => {
+    if (!hasStarted) return; // Don't start animation until user clicks
+
     const ctx = gsap.context(() => {
       // Background gradient animation
       gsap.to(".bg-gradient", {
@@ -282,7 +292,7 @@ function App() {
     }, appRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [hasStarted]);
 
   const handleSeek = (time) => {
     if (!tlRef.current) return;
@@ -316,6 +326,12 @@ function App() {
   return (
     <div ref={appRef} className="min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 bg-[length:200%_auto] bg-gradient relative">
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
+
+      {/* Start Overlay */}
+      {!hasStarted && <StartOverlay onStart={handleStart} />}
+
+      {/* Orientation Warning (Mobile only) */}
+      <OrientationWarning />
 
       <LanguageSelector currentLang={currentLang} onLanguageChange={handleLanguageChange} />
       <MusicPlayer isPlaying={isPlayingMusic} onSeek={handleSeek} />
