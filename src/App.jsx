@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import QuoteBook from './components/QuoteBook';
+import BirthdayCard from './components/BirthdayCard';
 import Monster from './components/Monster';
 import BigNumber from './components/BigNumber';
 import LanguageSelector from './components/LanguageSelector';
 import StartOverlay from './components/StartOverlay';
 import OrientationWarning from './components/OrientationWarning';
 import { translations } from './i18n/translations';
+import ShakeReveal from './components/ShakeReveal';
 import gsap from 'gsap';
 import cakeImg from './assets/cake.png';
 import endImg from './assets/end.png';
@@ -35,6 +36,8 @@ function App() {
   const [monsterFlip, setMonsterFlip] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [hasStarted, setHasStarted] = useState(false); // For start overlay
+  const [showShakeCard, setShowShakeCard] = useState(false);
+  const [hasShakeShown, setHasShakeShown] = useState(false);
 
   // Party Monsters State
   const [owletAction, setOwletAction] = useState('idle');
@@ -222,7 +225,7 @@ function App() {
       // Let's assume Music Start is T=0 for music.
       // We need to wait until Music T=240.
       // So duration is 240s.
-      tl.to({}, { duration: 229 }); // 240 - 11s (push cake) = 229s
+      tl.to({}, { duration: 228 }); // Reduced to ensure exit hits before/at 4:00
 
       // =================================================
       // PHASE 7: Exit All (Before Curtain Call)
@@ -323,6 +326,22 @@ function App() {
     setCurrentLang(lang);
   };
 
+  const handleTimeUpdate = (currentTime) => {
+    if (Math.floor(currentTime) === 120 && !hasShakeShown) {
+      setShowShakeCard(true);
+      setHasShakeShown(true);
+    }
+
+    // Safety Sync: Ensure Dancing Stops at 240s (4:00)
+    if (currentTime >= 240 && isDancing) {
+      setIsDancing(false);
+      setMonsterAction('walk');
+      setOwletAction('walk');
+      setDudeAction('walk');
+      setBubbleText("Bye bye!!");
+    }
+  };
+
   return (
     <div ref={appRef} className="min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 bg-[length:200%_auto] bg-gradient relative">
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
@@ -334,7 +353,10 @@ function App() {
       <OrientationWarning />
 
       <LanguageSelector currentLang={currentLang} onLanguageChange={handleLanguageChange} />
-      <MusicPlayer isPlaying={isPlayingMusic} onSeek={handleSeek} />
+      <MusicPlayer isPlaying={isPlayingMusic} onSeek={handleSeek} onTimeUpdate={handleTimeUpdate} />
+
+      {/* Shake Reveal Overlay */}
+      {showShakeCard && <ShakeReveal onClose={() => setShowShakeCard(false)} />}
 
       {/* Wish Display */}
       {isDancing && <WishDisplay text={currentWish} action={monsterAction} />}
@@ -422,7 +444,7 @@ function App() {
 
         {/* Book Wrapper */}
         <div ref={bookWrapperRef} className="z-10 absolute inset-0 flex items-center justify-center">
-          {showQuotes && <QuoteBook />}
+          {showQuotes && <BirthdayCard translations={translations[currentLang]} />}
         </div>
 
       </div>
