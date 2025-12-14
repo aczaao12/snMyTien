@@ -5,6 +5,7 @@ import BigNumber from './components/BigNumber';
 import LanguageSelector from './components/LanguageSelector';
 import StartOverlay from './components/StartOverlay';
 import OrientationWarning from './components/OrientationWarning';
+import BrowserCheck from './components/BrowserCheck';
 import { translations } from './i18n/translations';
 import ShakeReveal from './components/ShakeReveal';
 import gsap from 'gsap';
@@ -28,6 +29,7 @@ function App() {
   const dudeRef = useRef(null);
   const curtainCallRef = useRef(null);
   const tlRef = useRef(null); // Store timeline reference
+  const creditsRef = useRef(null);
 
   const [currentLang, setCurrentLang] = useState('vi');
   const [monsterAction, setMonsterAction] = useState('walk');
@@ -50,6 +52,18 @@ function App() {
   // Handle start button click
   const handleStart = () => {
     setHasStarted(true);
+    // Attempt to enter fullscreen
+    try {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+        document.documentElement.msRequestFullscreen();
+      }
+    } catch (err) {
+      console.log("Error attempting to enable full-screen mode:", err);
+    }
   };
 
   // Dance Moves List (excluding rock/dust)
@@ -70,7 +84,8 @@ function App() {
         setDudeAction(randomMove);
 
         // Random Wish
-        const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+        const currentWishes = wishes[currentLang] || wishes['vi'];
+        const randomWish = currentWishes[Math.floor(Math.random() * currentWishes.length)];
         setCurrentWish(randomWish);
 
       }, 1200); // Change move & wish every 1.2 seconds
@@ -78,7 +93,7 @@ function App() {
       setCurrentWish(''); // Clear wish when not dancing
     }
     return () => clearInterval(interval);
-  }, [isDancing]);
+  }, [isDancing, currentLang]);
 
   useEffect(() => {
     if (!hasStarted) return; // Don't start animation until user clicks
@@ -104,6 +119,7 @@ function App() {
       gsap.set(bookWrapperRef.current, { opacity: 0, scale: 0.8 });
       gsap.set(bubbleRef.current, { opacity: 0, scale: 0, y: 20 });
       gsap.set(curtainCallRef.current, { x: -screenWidth - 500 }); // Start far left
+      gsap.set(creditsRef.current, { x: screenWidth + 500 }); // Start far right
 
       // Party Monsters Hidden Initially
       gsap.set(owletRef.current, { x: -screenWidth / 2 - 100, opacity: 0, scale: 0 });
@@ -216,15 +232,6 @@ function App() {
       });
 
       // Dance Loop
-      // Song Duration = 260s (4m20s).
-      // Music starts roughly at T=40s in timeline (approx).
-      // Curtain Call starts at Music T=240s (20s remaining).
-      // So Dance Duration = 240s - (Time elapsed since music start).
-      // Let's just set a long duration, but we will jump out of it when seeking.
-      // Or better, we set it to exactly fill the gap.
-      // Let's assume Music Start is T=0 for music.
-      // We need to wait until Music T=240.
-      // So duration is 240s.
       tl.to({}, { duration: 228 }); // Reduced to ensure exit hits before/at 4:00
 
       // =================================================
@@ -264,13 +271,19 @@ function App() {
         setBubbleText(""); // Clear bubble
       });
 
-      // Push Curtain Call across screen
-      // Move from Left (-screenWidth) to Center (0)
+      // Push Curtain Call across screen (Left -> Center)
       tl.to(curtainCallRef.current, {
-        x: 0, // Center the container
-        duration: 15, // Slow push
+        x: 0,
+        duration: 15,
         ease: "linear"
       });
+
+      // Push Credits across screen (Right -> Center)
+      tl.to(creditsRef.current, {
+        x: 0,
+        duration: 15,
+        ease: "linear"
+      }, "<"); // Run parallel
 
       // Stop & Show Final Bubble
       tl.call(() => {
@@ -346,6 +359,9 @@ function App() {
     <div ref={appRef} className="min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 bg-[length:200%_auto] bg-gradient relative">
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
 
+      {/* Browser Check Overlay */}
+      <BrowserCheck />
+
       {/* Start Overlay */}
       {!hasStarted && <StartOverlay onStart={handleStart} />}
 
@@ -364,7 +380,7 @@ function App() {
       {/* Container for animation alignment */}
       <div className="relative flex items-center justify-center w-full max-w-6xl h-screen">
 
-        {/* Curtain Call Container (Phase 8) */}
+        {/* Curtain Call Container (Phase 8 - Left Side) */}
         <div
           ref={curtainCallRef}
           className="absolute z-50 flex flex-col items-center justify-center"
@@ -373,7 +389,6 @@ function App() {
           <div className="flex items-end">
             {/* Monsters Pushing (Left side) */}
             <div className="flex flex-col gap-4 mr-[-20px] z-10">
-              <PartyMonster type="owlet" action="push" />
               <PartyMonster type="pink" action="push" />
               <PartyMonster type="dude" action="push" />
             </div>
@@ -383,12 +398,24 @@ function App() {
               <img src={endImg} alt="End" className="max-h-[70vh] w-auto drop-shadow-2xl border-8 border-white rounded-lg rotate-2" />
             </div>
           </div>
+        </div>
 
-          {/* Credits */}
-          <div className="mt-8 bg-white/80 backdrop-blur-sm px-8 py-4 rounded-full shadow-xl border-2 border-pink-300">
+        {/* Curtain Call Credits (Phase 8 - Right Side) */}
+        <div
+          ref={creditsRef}
+          className="absolute z-50 flex items-center"
+          style={{ right: 0 }}
+        >
+          {/* Credits Text */}
+          <div className="bg-white/80 backdrop-blur-sm px-8 py-4 rounded-full shadow-xl border-2 border-pink-300 max-w-xs z-20">
             <p className="text-2xl font-bold text-pink-600 handwriting text-center">
               Design By Hồ Quốc Thắng gửi Đặng Thị Mỹ Tiên
             </p>
+          </div>
+
+          {/* Owlet Pushing from Right (Flipped) */}
+          <div className="ml-[-20px] z-10 scale-x-[-1]">
+            <PartyMonster type="owlet" action="push" />
           </div>
         </div>
 

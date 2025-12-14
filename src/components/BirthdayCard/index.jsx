@@ -59,8 +59,8 @@ const BirthdayCard = ({ translations }) => {
         // Update Hit Area for Button (Shared Logic)
         // Recalculate based on current state to ensure sync
         const btnScale = s.button.scale * (s.button.isHovered ? 1.1 : 1);
-        const btnW = 280;
-        const btnH = 70;
+        const btnW = 280 * 0.7;
+        const btnH = 70 * 0.7;
         // Button Position Logic from Renderer:
         // ctx.translate(centerX, centerY + 140 + button.y);
         const btnRealY = centerY + 140 + s.button.y;

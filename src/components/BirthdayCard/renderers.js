@@ -40,9 +40,9 @@ export const drawChatBox = (ctx, state, translations) => {
     ctx.scale(chatBox.scale, chatBox.scale);
     ctx.globalAlpha = chatBox.opacity;
 
-    // Box dimensions
-    const boxW = Math.min(700, width * 0.9);
-    const boxH = 300;
+    // Box dimensions (scaled down 30%)
+    const boxW = Math.min(700, width * 0.9) * 0.7;
+    const boxH = 300 * 0.7;
     const boxX = -boxW / 2;
     const boxY = -boxH / 2;
 
@@ -97,11 +97,11 @@ export const drawChatBox = (ctx, state, translations) => {
     ctx.lineTo(boxX + boxW - offset, boxY + boxH - offset - cornerSize);
     ctx.stroke();
 
-    // Name Tag
-    const nameTagW = 160;
-    const nameTagH = 44;
-    const nameTagX = boxX + 40;
-    const nameTagY = boxY - 22;
+    // Name Tag (scaled 0.7)
+    const nameTagW = 160 * 0.7;
+    const nameTagH = 44 * 0.7;
+    const nameTagX = boxX + (40 * 0.7);
+    const nameTagY = boxY - (22 * 0.7);
 
     const nameGrad = ctx.createLinearGradient(nameTagX, nameTagY, nameTagX + nameTagW, nameTagY);
     nameGrad.addColorStop(0, '#ec4899'); // pink-500
@@ -125,16 +125,19 @@ export const drawChatBox = (ctx, state, translations) => {
     ctx.fillText(translations.name, nameTagX + nameTagW / 2, nameTagY + nameTagH / 2);
 
     // Message Text
+    // Message Text
     ctx.fillStyle = 'white';
-    ctx.font = '500 28px "Dancing Script", cursive';
+    // Scaled font size
+    ctx.font = '500 20px "Dancing Script", cursive';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
     const textX = 0;
-    const textY = boxY + 80;
-    const padding = 60;
+    // Scaled positioning
+    const textY = boxY + (80 * 0.7);
+    const padding = 60 * 0.7;
     const maxWidth = boxW - (padding * 2);
-    const lineHeight = 40;
+    const lineHeight = 40 * 0.7;
     wrapText(ctx, text, textX, textY, maxWidth, lineHeight);
 
     ctx.restore();
@@ -153,8 +156,9 @@ export const drawButton = (ctx, state, translations) => {
     ctx.scale(btnScale, btnScale);
     ctx.globalAlpha = button.opacity;
 
-    const btnW = 280;
-    const btnH = 70;
+    // Scaled down by 30% (originally 280x70)
+    const btnW = 280 * 0.7;
+    const btnH = 70 * 0.7;
     const btnX = -btnW / 2;
     const btnY = -btnH / 2;
 
@@ -182,7 +186,7 @@ export const drawButton = (ctx, state, translations) => {
     ctx.stroke();
 
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 24px "Dancing Script", cursive';
+    ctx.font = 'bold 18px "Dancing Script", cursive';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 

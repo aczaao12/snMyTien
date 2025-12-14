@@ -140,6 +140,11 @@ const ShakeReveal = ({ onClose }) => {
 
                 ctx.save();
                 ctx.translate(centerX + shakeX, centerY + shakeY);
+
+                // Scale for viewport=1100
+                const scale = width / 800; // Reduced scale relative to mobile width
+                ctx.scale(scale, scale);
+
                 // Draw Envelope
                 ctx.fillStyle = '#ec4899'; // Pink
                 ctx.fillRect(-120, -80, 240, 160);
@@ -155,7 +160,7 @@ const ShakeReveal = ({ onClose }) => {
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText("Shake Me! 📱", 0, 120);
+                ctx.fillText("Lắc để mở", 0, 120);
                 ctx.restore();
             }
 
@@ -197,7 +202,7 @@ const ShakeReveal = ({ onClose }) => {
                     ctx.save();
                     ctx.translate(centerX + s.image.x, centerY + s.image.y);
 
-                    const scaleFactor = Math.min(1, width / 400);
+                    const scaleFactor = width / 800; // Reduced scale
                     ctx.scale(s.image.scale * scaleFactor, s.image.scale * scaleFactor);
                     ctx.rotate(s.image.angle);
 

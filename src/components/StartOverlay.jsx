@@ -2,7 +2,7 @@ import React from 'react';
 
 const StartOverlay = ({ onStart }) => {
     return (
-        <div className="fixed inset-0 z-[100] bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex items-center justify-center">
+        <div className="fixed inset-0 w-screen h-screen z-[100] bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 flex items-center justify-center">
             <div className="text-center px-8">
                 <h1 className="text-6xl md:text-8xl font-bold text-white handwriting mb-8 animate-pulse">
                     🎉 Sinh Nhật 20 🎂
