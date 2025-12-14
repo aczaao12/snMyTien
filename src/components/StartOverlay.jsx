@@ -8,14 +8,19 @@ const StartOverlay = ({ onStart }) => {
                     🎉 Sinh Nhật 20 🎂
                 </h1>
                 <p className="text-2xl md:text-3xl text-white/90 mb-12 handwriting">
-                    Chúc mừng sinh nhật Đặng Thị Mỹ Tiên!
+                    Gửi chúc mừng sinh nhật Bạn Đặng Thị Mỹ Tiên!
                 </p>
-                <button
-                    onClick={onStart}
-                    className="bg-white text-pink-600 px-12 py-6 rounded-full text-2xl md:text-3xl font-bold handwriting shadow-2xl hover:scale-110 transition-transform duration-300 hover:bg-pink-50"
-                >
-                    Bắt đầu 🎵
-                </button>
+                <div className="flex flex-col items-center gap-6">
+                    <button
+                        onClick={onStart}
+                        className="bg-white text-pink-600 px-12 py-6 rounded-full text-2xl md:text-3xl font-bold handwriting shadow-2xl hover:scale-110 transition-transform duration-300 hover:bg-pink-50"
+                    >
+                        Bắt đầu 🎵
+                    </button>
+                    <p className="text-white/80 text-lg handwriting animate-pulse">
+                        Design By Hồ Quốc Thắng
+                    </p>
+                </div>
             </div>
         </div>
     );
